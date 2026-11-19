@@ -7,6 +7,7 @@ const levels = [
   { id: '750_849', label: '750 ~ 849점', detail: '중급' },
   { id: 'over_850', label: '850점 이상', detail: '고난도 · 900점 목표' }
 ]
+type Problem = typeof problems[number] & { date?: string }
 type History = { date: string; level: string; problemId: string; selected: number; feedback?: string }
 const level = ref('')
 const pendingLevel = ref('')
@@ -15,12 +16,16 @@ const selected = ref<number | null>(null)
 const feedback = ref('')
 const storageWarning = ref('')
 const date = ref('')
+const restoredProblemId = ref('')
 let timer: ReturnType<typeof setInterval>
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 const problem = computed(() => {
-  const pool = problems.filter(item => item.level === level.value)
-  const day = Math.floor(Date.parse(date.value + 'T00:00:00+09:00') / 86400000)
-  return pool[Math.abs(day || 0) % pool.length] || problems[0]!
+  const levelProblems: Problem[] = problems.filter(item => item.level === level.value)
+  const restored = levelProblems.find(item => item.id === restoredProblemId.value)
+  const scheduled = levelProblems.find(item => item.date === date.value)
+  const pool = levelProblems.filter(item => !item.date)
+  const day = Math.floor(Date.parse(date.value + 'T00:00:00Z') / 86400000)
+  return restored || scheduled || pool[((day || 0) % pool.length + pool.length) % pool.length] || problems[0]!
 })
 const levelLabel = computed(() => levels.find(item => item.id === level.value)?.label)
 const correct = computed(() => selected.value === problem.value.answer)
@@ -43,10 +48,12 @@ function track(event: string, extra: Record<string, unknown> = {}) {
 function restore() {
   selected.value = null
   feedback.value = ''
+  restoredProblemId.value = ''
   screen.value = 'question'
   try {
     const history: History = JSON.parse(read('toeic_daily_history') || 'null')
-    if (history?.date === date.value && history.level === level.value && history.problemId === problem.value.id && Number.isInteger(history.selected) && history.selected >= 0 && history.selected < 4) {
+    if (history?.date === date.value && history.level === level.value && Number.isInteger(history.selected) && history.selected >= 0 && history.selected < 4 && problems.some(item => item.level === level.value && item.id === history.problemId)) {
+      restoredProblemId.value = history.problemId
       selected.value = history.selected
       feedback.value = ['helpful', 'unhelpful'].includes(history.feedback || '') ? history.feedback! : ''
       screen.value = 'result'
@@ -59,7 +66,7 @@ function start() {
   level.value = pendingLevel.value
   date.value = today()
   write('toeic_user_level', level.value)
-  if (changed) { selected.value = null; feedback.value = ''; screen.value = 'question'; write('toeic_daily_history', 'null') }
+  if (changed) { selected.value = null; feedback.value = ''; restoredProblemId.value = ''; screen.value = 'question'; write('toeic_daily_history', 'null') }
   else restore()
   track('level_selected')
 }
@@ -119,7 +126,7 @@ onUnmounted(() => clearInterval(timer))
         <div class="intro question-intro"><p class="eyebrow">{{ dateLabel }} · DAILY PART 5</p><h1>{{ screen === 'result' ? '한 문제만큼, 더 가까이.' : '오늘도 한 걸음 앞으로.' }}</h1><p>{{ screen === 'result' ? '정답보다 중요한 건, 이해하고 넘어가는 것.' : '빈칸에 들어갈 가장 알맞은 답을 골라주세요.' }}</p></div>
         <section class="card question-card" aria-label="오늘의 문법 문제">
           <div class="question-meta"><span>PART 5 <span class="meta-divider">/</span> 문법</span><span v-if="screen === 'question'">오늘의 한 문제</span><span v-else class="badge" :class="correct ? 'success' : 'incorrect'" role="status">{{ correct ? '✓ 정답입니다!' : '✕ 오답입니다' }}</span></div>
-          <p class="sentence" lang="en">{{ problem.sentence.split('_______')[0] }}<span class="blank" :class="{ filled: screen === 'result' }">{{ screen === 'result' ? problem.options[problem.answer] : '　　　　 ' }}</span>{{ problem.sentence.split('_______')[1] }}</p>
+          <p class="sentence" lang="en">{{ problem.sentence.split('_______')[0] }}<span class="blank" :class="{ filled: screen === 'result' }">{{ screen === 'result' ? problem.options[problem.answer] : '' }}</span>{{ problem.sentence.split('_______')[1] }}</p>
           <p class="answer-instruction">{{ screen === 'result' ? '선택한 답과 정답을 확인해보세요.' : '정답을 하나 선택해주세요.' }}</p>
           <fieldset><legend class="sr-only">답안 선택</legend><label v-for="(option, index) in problem.options" :key="problem.id + index" class="option answer-option" :class="{ chosen: selected === index, 'correct-option': screen === 'result' && problem.answer === index, 'wrong-option': screen === 'result' && selected === index && !correct }"><input v-model="selected" type="radio" name="answer" :value="index" :disabled="screen === 'result'"><span class="letter">{{ 'ABCD'[index] }}</span><span lang="en">{{ option }}</span><span v-if="screen === 'result' && problem.answer === index" class="answer-tag">정답</span><span v-if="screen === 'result' && selected === index" class="my-tag">내 선택</span></label></fieldset>
           <button v-if="screen === 'question'" class="primary" :disabled="selected === null" @click="submit">정답 확인하기 <span>→</span></button>

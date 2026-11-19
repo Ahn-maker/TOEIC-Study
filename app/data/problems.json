@@ -103,5 +103,110 @@
       "결과절에는 조동사와 have + 과거분사가 필요합니다.",
       "실현되지 않은 과거의 가능성을 나타냅니다."
     ]
+  },
+  {
+    "id": "beginner-02",
+    "level": "beginner",
+    "sentence": "The documents _______ on the desk.",
+    "options": [
+      "is",
+      "are",
+      "am",
+      "be"
+    ],
+    "answer": 1,
+    "translation": "서류들은 책상 위에 있습니다.",
+    "topic": "복수 주어와 be동사",
+    "rule": "복수 주어 The documents에는 are를 사용합니다.",
+    "reasons": [
+      "is는 단수 주어에 사용합니다.",
+      "are는 복수 주어에 맞습니다.",
+      "am은 주어 I와 사용합니다.",
+      "원형 be는 단독으로 현재형 동사가 될 수 없습니다."
+    ]
+  },
+  {
+    "id": "under_600-02",
+    "level": "under_600",
+    "sentence": "The meeting starts _______ 9 a.m.",
+    "options": [
+      "at",
+      "in",
+      "on",
+      "during"
+    ],
+    "answer": 0,
+    "translation": "회의는 오전 9시에 시작합니다.",
+    "topic": "시각을 나타내는 전치사",
+    "rule": "구체적인 시각 앞에는 at을 사용합니다.",
+    "reasons": [
+      "at은 구체적인 시각 앞에 씁니다.",
+      "in은 월이나 연도 등의 표현에 사용합니다.",
+      "on은 날짜나 요일 앞에 사용합니다.",
+      "during은 기간을 나타내는 명사와 사용합니다."
+    ]
+  },
+  {
+    "id": "600_749-02",
+    "level": "600_749",
+    "sentence": "Please read the instructions _______ before operating the machine.",
+    "options": [
+      "care",
+      "careful",
+      "carefully",
+      "carefulness"
+    ],
+    "answer": 2,
+    "translation": "기계를 작동하기 전에 지침을 주의 깊게 읽어 주세요.",
+    "topic": "동사를 수식하는 부사",
+    "rule": "동사 read를 수식하는 부사 carefully가 필요합니다.",
+    "reasons": [
+      "care는 명사 또는 동사입니다.",
+      "careful은 형용사입니다.",
+      "carefully는 동사를 수식하는 부사입니다.",
+      "carefulness는 명사입니다."
+    ]
+  },
+  {
+    "id": "750_849-02",
+    "level": "750_849",
+    "sentence": "The report must _______ by the end of the day.",
+    "options": [
+      "submit",
+      "submitted",
+      "be submitted",
+      "be submitting"
+    ],
+    "answer": 2,
+    "translation": "보고서는 오늘이 끝나기 전까지 제출되어야 합니다.",
+    "topic": "조동사의 수동태",
+    "rule": "보고서가 제출되는 대상이므로 조동사 must 뒤에 be와 과거분사 submitted를 사용합니다.",
+    "reasons": [
+      "수동태에는 be와 과거분사가 필요합니다.",
+      "조동사 뒤에는 동사원형이 필요합니다.",
+      "be submitted는 조동사 뒤에 오는 수동태입니다.",
+      "진행형은 제출되는 수동의 의미를 표현하지 못합니다."
+    ]
+  },
+  {
+    "id": "over_850-02",
+    "level": "over_850",
+    "sentence": "Not until the audit was complete _______ the discrepancy.",
+    "options": [
+      "the team discovered",
+      "did the team discover",
+      "the team had discovered",
+      "discovered the team"
+    ],
+    "answer": 1,
+    "translation": "감사가 완료되고 나서야 그 팀은 불일치를 발견했습니다.",
+    "topic": "부정 표현 도치",
+    "rule": "Not until로 시작하는 표현이 문두에 오면 주절에서 조동사와 주어가 도치됩니다. 과거형이므로 did 뒤에 동사원형을 씁니다.",
+    "reasons": [
+      "주절에 조동사와 주어의 도치가 필요합니다.",
+      "did가 주어 앞으로 나오고 동사원형 discover가 이어집니다.",
+      "부정 표현 뒤 주절에 도치가 필요합니다.",
+      "일반동사를 주어 앞으로 바로 옮기지 않습니다."
+    ]
   }
 ]
