@@ -1,0 +1,107 @@
+[
+  {
+    "id": "beginner-01",
+    "level": "beginner",
+    "sentence": "The new employee _______ very friendly.",
+    "options": [
+      "is",
+      "are",
+      "be",
+      "being"
+    ],
+    "answer": 0,
+    "translation": "새 직원은 매우 친절합니다.",
+    "topic": "단수 주어와 be동사",
+    "rule": "단수 주어 The new employee에는 현재형 is를 사용합니다.",
+    "reasons": [
+      "단수 주어에 맞는 is입니다.",
+      "are는 복수 주어에 사용합니다.",
+      "원형 be를 단독으로 사용할 수 없습니다.",
+      "being만으로는 문장의 동사가 될 수 없습니다."
+    ]
+  },
+  {
+    "id": "under_600-01",
+    "level": "under_600",
+    "sentence": "Please submit your application _______ Friday.",
+    "options": [
+      "at",
+      "by",
+      "onward",
+      "during"
+    ],
+    "answer": 1,
+    "translation": "금요일까지 지원서를 제출해 주세요.",
+    "topic": "기한을 나타내는 전치사",
+    "rule": "by는 특정 시점까지 완료해야 하는 기한을 나타냅니다.",
+    "reasons": [
+      "at은 구체적인 시각과 주로 사용합니다.",
+      "by Friday는 금요일까지라는 기한입니다.",
+      "onward는 이 자리에 전치사로 쓸 수 없습니다.",
+      "during 뒤에는 기간을 나타내는 명사가 필요합니다."
+    ]
+  },
+  {
+    "id": "600_749-01",
+    "level": "600_749",
+    "sentence": "The manager spoke _______ about the new project.",
+    "options": [
+      "enthusiastic",
+      "enthusiastically",
+      "enthusiasm",
+      "enthusiast"
+    ],
+    "answer": 1,
+    "translation": "매니저는 새 프로젝트에 대해 열정적으로 말했습니다.",
+    "topic": "동사를 수식하는 부사",
+    "rule": "동사 spoke를 수식하려면 부사 enthusiastically가 필요합니다.",
+    "reasons": [
+      "형용사는 여기서 동사를 수식할 수 없습니다.",
+      "부사로 spoke를 수식합니다.",
+      "enthusiasm은 열정이라는 명사입니다.",
+      "enthusiast는 열성적인 사람이라는 명사입니다."
+    ]
+  },
+  {
+    "id": "750_849-01",
+    "level": "750_849",
+    "sentence": "Ms. Kim _______ the quarterly budget report before the board meeting begins tomorrow.",
+    "options": [
+      "review",
+      "reviewed",
+      "will review",
+      "reviewing"
+    ],
+    "answer": 2,
+    "translation": "김 씨는 내일 이사회가 시작되기 전에 분기별 예산 보고서를 검토할 것입니다.",
+    "topic": "시간 부사절과 미래시제",
+    "rule": "tomorrow가 미래를 나타냅니다. 시간 부사절 before 뒤에서는 현재형 begins가 미래를 대신하고, 주절에는 will review를 사용합니다.",
+    "reasons": [
+      "3인칭 단수 주어에 원형 review를 쓸 수 없습니다.",
+      "과거형은 tomorrow와 맞지 않습니다.",
+      "미래의 검토를 나타내는 will review가 정답입니다.",
+      "분사만으로 문장의 동사가 될 수 없습니다."
+    ]
+  },
+  {
+    "id": "over_850-01",
+    "level": "over_850",
+    "sentence": "Had the supplier notified us earlier, we _______ alternative arrangements.",
+    "options": [
+      "make",
+      "will make",
+      "had made",
+      "could have made"
+    ],
+    "answer": 3,
+    "translation": "공급업체가 더 일찍 알려 주었더라면 우리는 대안을 마련할 수 있었을 것입니다.",
+    "topic": "가정법 과거완료의 도치",
+    "rule": "Had the supplier notified는 If the supplier had notified의 도치입니다. 과거에 실현되지 않은 결과는 could have + 과거분사로 나타냅니다.",
+    "reasons": [
+      "현재형은 과거의 가정에 맞지 않습니다.",
+      "미래형은 과거의 반대 가정에 맞지 않습니다.",
+      "결과절에는 조동사와 have + 과거분사가 필요합니다.",
+      "실현되지 않은 과거의 가능성을 나타냅니다."
+    ]
+  }
+]
