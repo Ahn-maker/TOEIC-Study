@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import problems from './data/problems.json'
+import questionBank from './data/problems.json'
+import previousProblems from './data/legacy-problems.json'
+const problems = [...questionBank.map(item => ({ ...item, reasons: [] as string[] })), ...previousProblems.map(item => ({ ...item, wrongExplanation: '' }))]
 const levels = [
   { id: 'beginner', label: '토익 응시 경험 없음', detail: '입문' },
   { id: 'under_600', label: '600점 미만', detail: '기초' },
@@ -48,15 +50,17 @@ function shuffle(ids: string[]) {
   return shuffled
 }
 function chooseProblem(previousId = '') {
-  const ids = problems.filter(item => item.level === level.value).map(item => item.id)
+  const ids = questionBank.filter(item => item.level === level.value).map(item => item.id)
+  const validIds = problems.filter(item => item.level === level.value).map(item => item.id)
   let state = progress.value[level.value]
+  const previousToday = state?.date === date.value && validIds.includes(state.problemId) ? state.problemId : ''
   if (!state || !Array.isArray(state.order) || !Number.isInteger(state.next) || state.next < 0 || state.next > state.order.length || new Set(state.order).size !== state.order.length || state.order.some(id => !ids.includes(id))) {
-    state = { order: shuffle(ids), next: 0, date: '', problemId: '' }
+    state = { order: shuffle(ids), next: 0, date: previousToday ? date.value : '', problemId: previousToday }
   }
   const added = ids.filter(id => !state.order.includes(id))
   state.order.push(...shuffle(added))
-  if (state.date !== date.value || !ids.includes(state.problemId)) {
-    if (previousId && ids.includes(previousId)) {
+  if (state.date !== date.value || !validIds.includes(state.problemId)) {
+    if (previousId && validIds.includes(previousId)) {
       const index = state.order.indexOf(previousId, state.next)
       if (index >= 0) {
         ;[state.order[state.next], state.order[index]] = [state.order[index]!, state.order[state.next]!]
@@ -169,7 +173,7 @@ onUnmounted(() => clearInterval(timer))
           <p class="answer-instruction">{{ screen === 'result' ? '선택한 답과 정답을 확인해보세요.' : '정답을 하나 선택해주세요.' }}</p>
           <fieldset><legend class="sr-only">답안 선택</legend><label v-for="(option, index) in problem.options" :key="problem.id + index" class="option answer-option" :class="{ chosen: selected === index, 'correct-option': screen === 'result' && problem.answer === index, 'wrong-option': screen === 'result' && selected === index && !correct }"><input v-model="selected" type="radio" name="answer" :value="index" :disabled="screen === 'result'"><span class="letter">{{ 'ABCD'[index] }}</span><span lang="en">{{ option }}</span><span v-if="screen === 'result' && problem.answer === index" class="answer-tag">정답</span><span v-if="screen === 'result' && selected === index" class="my-tag">내 선택</span></label></fieldset>
           <button v-if="screen === 'question'" class="primary" :disabled="selected === null" @click="submit">정답 확인하기 <span>→</span></button>
-          <div v-else class="explanation"><div class="explanation-heading"><span class="book-icon">▤</span><h2>오늘의 문법 노트</h2></div><h3>문장 해석</h3><p>{{ problem.translation }}</p><h3>정답과 문법 포인트</h3><span class="topic">{{ problem.topic }}</span><p>{{ problem.rule }}</p><h3>오답 살펴보기</h3><ul><template v-for="(reason, index) in problem.reasons" :key="index"><li v-if="index !== problem.answer"><b>{{ 'ABCD'[index] }}</b><span>{{ reason }}</span></li></template></ul></div>
+          <div v-else class="explanation"><div class="explanation-heading"><span class="book-icon">▤</span><h2>오늘의 문법 노트</h2></div><h3>문장 해석</h3><p>{{ problem.translation }}</p><h3>정답과 문법 포인트</h3><span class="topic">{{ problem.topic }}</span><p>{{ problem.rule }}</p><h3>오답 살펴보기</h3><p v-if="problem.wrongExplanation">{{ problem.wrongExplanation }}</p><ul v-else><template v-for="(reason, index) in problem.reasons" :key="index"><li v-if="index !== problem.answer"><b>{{ 'ABCD'[index] }}</b><span>{{ reason }}</span></li></template></ul></div>
         </section>
         <section v-if="screen === 'result'" class="feedback" aria-label="해설 피드백"><h2>해설이 이해하는 데 도움이 되었나요?</h2><div><button :disabled="!!feedback" :class="{ rated: feedback === 'helpful' }" @click="rate('helpful')">♡ 도움 됐어요</button><button :disabled="!!feedback" :class="{ rated: feedback === 'unhelpful' }" @click="rate('unhelpful')">아쉬워요</button></div><p v-if="feedback" role="status">의견 고마워요. 더 좋은 학습을 만드는 데 참고할게요.</p><p v-else>여러분의 의견으로 더 나은 해설을 만들어요.</p></section>
       </template>
