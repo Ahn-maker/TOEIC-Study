@@ -7,7 +7,6 @@ const levels = [
   { id: '750_849', label: '750 ~ 849점', detail: '중급' },
   { id: 'over_850', label: '850점 이상', detail: '고난도 · 900점 목표' }
 ]
-type Problem = typeof problems[number] & { date?: string }
 type History = { date: string; level: string; problemId: string; selected: number; feedback?: string }
 const level = ref('')
 const pendingLevel = ref('')
@@ -16,17 +15,12 @@ const selected = ref<number | null>(null)
 const feedback = ref('')
 const storageWarning = ref('')
 const date = ref('')
-const restoredProblemId = ref('')
+const currentProblemId = ref('')
+type Progress = { order: string[]; next: number; date: string; problemId: string }
+const progress = ref<Record<string, Progress>>({})
 let timer: ReturnType<typeof setInterval>
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
-const problem = computed(() => {
-  const levelProblems: Problem[] = problems.filter(item => item.level === level.value)
-  const restored = levelProblems.find(item => item.id === restoredProblemId.value)
-  const scheduled = levelProblems.find(item => item.date === date.value)
-  const pool = levelProblems.filter(item => !item.date)
-  const day = Math.floor(Date.parse(date.value + 'T00:00:00Z') / 86400000)
-  return restored || scheduled || pool[((day || 0) % pool.length + pool.length) % pool.length] || problems[0]!
-})
+const problem = computed(() => problems.find(item => item.id === currentProblemId.value) || problems[0]!)
 const levelLabel = computed(() => levels.find(item => item.id === level.value)?.label)
 const correct = computed(() => selected.value === problem.value.answer)
 const dateLabel = computed(() => date.value ? new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', weekday: 'long' }).format(new Date(date.value + 'T12:00:00+09:00')) : '')
@@ -45,20 +39,61 @@ function track(event: string, extra: Record<string, unknown> = {}) {
     gtag('event', event, payload)
   }
 }
+function shuffle(ids: string[]) {
+  const shuffled = [...ids]
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const swap = Math.floor(Math.random() * (index + 1))
+    ;[shuffled[index], shuffled[swap]] = [shuffled[swap]!, shuffled[index]!]
+  }
+  return shuffled
+}
+function chooseProblem(previousId = '') {
+  const ids = problems.filter(item => item.level === level.value).map(item => item.id)
+  let state = progress.value[level.value]
+  if (!state || !Array.isArray(state.order) || !Number.isInteger(state.next) || state.next < 0 || state.next > state.order.length || new Set(state.order).size !== state.order.length || state.order.some(id => !ids.includes(id))) {
+    state = { order: shuffle(ids), next: 0, date: '', problemId: '' }
+  }
+  const added = ids.filter(id => !state.order.includes(id))
+  state.order.push(...shuffle(added))
+  if (state.date !== date.value || !ids.includes(state.problemId)) {
+    if (previousId && ids.includes(previousId)) {
+      const index = state.order.indexOf(previousId, state.next)
+      if (index >= 0) {
+        ;[state.order[state.next], state.order[index]] = [state.order[index]!, state.order[state.next]!]
+        state.next++
+      }
+      state.problemId = previousId
+    } else {
+      if (state.next >= state.order.length) {
+        state.order = shuffle(ids)
+        state.next = 0
+        if (state.order.length > 1 && state.order[0] === state.problemId) {
+          ;[state.order[0], state.order[1]] = [state.order[1]!, state.order[0]!]
+        }
+      }
+      state.problemId = state.order[state.next++]!
+    }
+    state.date = date.value
+  }
+  progress.value[level.value] = state
+  currentProblemId.value = state.problemId
+  write('toeic_problem_progress', JSON.stringify(progress.value))
+}
 function restore() {
   selected.value = null
   feedback.value = ''
-  restoredProblemId.value = ''
   screen.value = 'question'
+  let history: History | null = null
   try {
-    const history: History = JSON.parse(read('toeic_daily_history') || 'null')
-    if (history?.date === date.value && history.level === level.value && Number.isInteger(history.selected) && history.selected >= 0 && history.selected < 4 && problems.some(item => item.level === level.value && item.id === history.problemId)) {
-      restoredProblemId.value = history.problemId
-      selected.value = history.selected
-      feedback.value = ['helpful', 'unhelpful'].includes(history.feedback || '') ? history.feedback! : ''
-      screen.value = 'result'
-    }
+    history = JSON.parse(read('toeic_daily_history') || 'null')
   } catch { /* Invalid saved records are replaced on the next submission. */ }
+  const validHistory = history?.date === date.value && history.level === level.value && Number.isInteger(history.selected) && history.selected >= 0 && history.selected < 4 && problems.some(item => item.level === level.value && item.id === history?.problemId)
+  chooseProblem(validHistory ? history!.problemId : '')
+  if (validHistory && history?.problemId === currentProblemId.value) {
+    selected.value = history.selected
+    feedback.value = ['helpful', 'unhelpful'].includes(history.feedback || '') ? history.feedback! : ''
+    screen.value = 'result'
+  }
 }
 function start() {
   if (!levels.some(item => item.id === pendingLevel.value)) return
@@ -66,8 +101,8 @@ function start() {
   level.value = pendingLevel.value
   date.value = today()
   write('toeic_user_level', level.value)
-  if (changed) { selected.value = null; feedback.value = ''; restoredProblemId.value = ''; screen.value = 'question'; write('toeic_daily_history', 'null') }
-  else restore()
+  if (changed) write('toeic_daily_history', 'null')
+  restore()
   track('level_selected')
 }
 function save() {
@@ -76,7 +111,7 @@ function save() {
 function refreshDay() {
   if (date.value === today()) return false
   date.value = today()
-  if (level.value) restore()
+  if (level.value && screen.value !== 'level') restore()
   return true
 }
 function submit() {
@@ -89,6 +124,10 @@ function rate(value: string) {
 }
 onMounted(() => {
   date.value = today()
+  try {
+    const savedProgress = JSON.parse(read('toeic_problem_progress') || '{}')
+    if (savedProgress && typeof savedProgress === 'object' && !Array.isArray(savedProgress)) progress.value = savedProgress
+  } catch { /* Invalid progress is replaced when a problem is chosen. */ }
   const saved = read('toeic_user_level')
   if (levels.some(item => item.id === saved)) { level.value = saved!; pendingLevel.value = saved!; restore() }
   timer = setInterval(refreshDay, 15000)
