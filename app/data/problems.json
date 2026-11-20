@@ -252,7 +252,7 @@
     "answer": 2,
     "translation": "오크리지 출판사는 전기 출간일을 11월 초까지 연기하기로 결정했습니다.",
     "topic": "핵심 문법",
-    "rule": "타동사 decide는 목적어로 to부정사만 취하므로 (C) to postpone이 정답입니다.",
+    "rule": "이 문장에서는 decide 뒤에 목적어로 to부정사를 사용하므로 (C) to postpone이 정답입니다.",
     "wrongExplanation": "(A) postpone(동사원형)은 본동사 decided 뒤에중복으로 올 수 없고, (B) postponing(동명사)은 decide의 목적어로 쓰이지 않으며, (D) postponed(과거분사)는 목적어 역할을 못 합니다."
   },
   {
@@ -268,7 +268,7 @@
     "answer": 1,
     "translation": "공장 감독관은 야간 근무를 시작하기 전에 조립 라인 장비를 점검하자고 제안했습니다.",
     "topic": "핵심 문법",
-    "rule": "타동사 suggest는 동명사만을 목적어로 취하므로 (B) inspecting이 정답입니다.",
+    "rule": "이 문장에서는 suggest 뒤에 제안하는 행동을 나타내는 동명사를 사용하므로 (B) inspecting이 정답입니다.",
     "wrongExplanation": "(A) inspect(동사원형)와 (D) inspected(과거분사) 는 목적어 역할을 못 하며, (C) to inspect(to부정사)는 suggest의 목적어로 사용할 수 없습니다."
   },
   {
@@ -581,7 +581,7 @@
     "sentence": "By the time the CEO arrives at the conference center, the opening remarks _______ .",
     "options": [
       "will has finished",
-      "have been finished",
+      "has been finished",
       "will have been finished",
       "were finished"
     ],
@@ -589,7 +589,7 @@
     "translation": "최고경영자가 회의장에 도착할 무렵에는 개회사가 끝나 있을 것입니다.",
     "topic": "핵심 문법",
     "rule": "미래의 기준 시점까지 완료되는 일을 나타내므로 미래완료 수동태 will have been finished가 적절합니다.",
-    "wrongExplanation": "(A) will 뒤에는 동사원형이 와야 합니다. (B) 현재완료는 미래 기준 시점의 완료를 나타내지 못합니다. (D) 과거형은 미래 기준 시점과 맞지 않습니다."
+    "wrongExplanation": "(A) will 뒤에는 동사원형이 와야 합니다. (B) has는 복수 주어 opening remarks와 수가 맞지 않습니다. (D) 과거형은 미래 기준 시점과 맞지 않습니다."
   },
   {
     "id": "pdf-38",
@@ -653,7 +653,7 @@
     "translation": "경비를 청구할 때 직원은 모든 식사와 숙박에 대한 상세 영수증을 첨부해야 합니다.",
     "topic": "핵심 문법",
     "rule": "현재분사(submitting) 앞에 위치하여 분사구문의 의미를 명확히 해 주는 시간 접속사 (B) When이 정답입니다.",
-    "wrongExplanation": "(A) Prior는 단독으로 쓸 수 없고 'Prior to + 동명사' 형태여야 하며, (C) During은 전치사로 동명사를 목적어로취하지 않고, (D) Until then은 부사구라 분사구문을 이끌 수 없습니다."
+    "wrongExplanation": "(A) Prior는 이 문맥에서 'prior to + 동명사'로 써야 합니다. (C) During은 기간이나 사건을 나타내는 명사구와 주로 쓰이며, 여기서는 경비 청구 행위를 나타내는 submitting과 자연스럽게 어울리지 않습니다. (D) Until then은 부사구라 뒤의 분사구문을 연결하지 못합니다."
   },
   {
     "id": "pdf-42",
@@ -860,7 +860,7 @@
     "answer": 0,
     "translation": "새 자동 포장 시스템은 생산 속도를 높이는 동시에 자재 낭비를 줄입니다.",
     "topic": "핵심 문법",
-    "rule": "as well as는 앞의 increases와 함께 뒤의 reducing을 연결해 생산 속도 증가와 자재 낭비 감소를 함께 나타냅니다.",
+    "rule": "as well as 뒤의 동명사구 reducing material waste가 앞 절에 추가 정보를 더해, 생산 속도를 높이는 것과 함께 자재 낭비도 줄인다는 뜻을 나타냅니다.",
     "wrongExplanation": "(B) in addition 뒤에 동명사를 연결하려면 to가 필요합니다. (C) moreover는 접속부사입니다. (D) alongside with는 올바른 연결 표현이 아닙니다."
   },
   {
@@ -1058,7 +1058,7 @@
   {
     "id": "pdf-67",
     "level": "over_850",
-    "sentence": "The manufacturing division streamlined production costs without the risk of _______ quality standards.",
+    "sentence": "The manufacturing division reduced production costs without the risk of _______ quality standards.",
     "options": [
       "compromise",
       "compromises",
@@ -1165,7 +1165,7 @@
     "translation": "새로 임명된 최고재무책임자는 기업 구조조정 분야의 약 20년 경력을 경영진에 더합니다.",
     "topic": "핵심 문법",
     "rule": "수사(twenty years) 앞에서 '거의, 약'의 의미로 수식하는 부사 (B) nearly가 정답입니다.",
-    "wrongExplanation": "(A) near는 전치사(~근처에)나 형용사(가까운)로쓰이며 수사를 수식하는 '거의'의 뜻이 없고, (C) nears(동사)와 (D) neared(과거동사)는 본동사 brings와 충돌합니다."
+    "wrongExplanation": "(A) near는 격식 있는 표준 영어에서 이 수량 앞의 '거의'라는 뜻으로는 nearly보다 부적절합니다. (C) nears와 (D) neared는 동사이므로 본동사 brings가 있는 이 자리에 맞지 않습니다."
   },
   {
     "id": "pdf-74",
