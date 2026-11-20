@@ -16,6 +16,24 @@ const screen = ref<'level' | 'question' | 'result'>('level')
 const selected = ref<number | null>(null)
 const feedback = ref('')
 const storageWarning = ref('')
+const coinDates = ref<string[]>([])
+const coinEarned = ref(false)
+function loadCoins() {
+  try {
+    const saved = JSON.parse(read('toeic_coin_dates') || '[]')
+    return Array.isArray(saved) ? [...new Set(saved.filter((item): item is string => typeof item === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item)))] : []
+  } catch { return [] }
+}
+function awardCoin() {
+  const dates = [...new Set([...coinDates.value, ...loadCoins()])]
+  coinEarned.value = !dates.includes(date.value)
+  if (coinEarned.value) dates.push(date.value)
+  coinDates.value = dates
+  write('toeic_coin_dates', JSON.stringify(dates))
+}
+function syncCoins(event: StorageEvent) {
+  if (event.key === 'toeic_coin_dates' || event.key === null) coinDates.value = loadCoins()
+}
 const date = ref('')
 const currentProblemId = ref('')
 type Progress = { order: string[]; next: number; date: string; problemId: string }
@@ -85,6 +103,7 @@ function chooseProblem(previousId = '') {
 }
 function restore() {
   selected.value = null
+  coinEarned.value = false
   feedback.value = ''
   screen.value = 'question'
   let history: History | null = null
@@ -120,7 +139,7 @@ function refreshDay() {
 }
 function submit() {
   if (refreshDay() || selected.value === null || screen.value !== 'question') return
-  screen.value = 'result'; save(); track('answer_submitted', { correct: correct.value })
+  screen.value = 'result'; awardCoin(); save(); track('answer_submitted', { correct: correct.value })
 }
 function rate(value: string) {
   if (refreshDay() || feedback.value || screen.value !== 'result') return
@@ -128,6 +147,8 @@ function rate(value: string) {
 }
 onMounted(() => {
   date.value = today()
+  coinDates.value = loadCoins()
+  window.addEventListener('storage', syncCoins)
   try {
     const savedProgress = JSON.parse(read('toeic_problem_progress') || '{}')
     if (savedProgress && typeof savedProgress === 'object' && !Array.isArray(savedProgress)) progress.value = savedProgress
@@ -144,15 +165,16 @@ onMounted(() => {
     useHead({ script: [{ src: `https://www.googletagmanager.com/gtag/js?id=${id}`, async: true }] })
   }
 })
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => { clearInterval(timer); window.removeEventListener('storage', syncCoins) })
 </script>
 
 <template>
   <div class="site">
     <header class="header">
       <a class="brand" href="/" aria-label="TOEIC 1-Day 홈"><span class="brand-icon">t<span>•</span></span> TOEIC <span class="brand-light">1-Day</span></a>
+      <div class="header-actions"><div class="coin-status" :aria-label="`T Coin ${coinDates.length}개`"><span class="coin-icon" aria-hidden="true">T</span><span class="coin-label">Coin</span><strong>{{ coinDates.length }}</strong></div>
       <div v-if="level && screen !== 'level'" class="level-control"><span>{{ levelLabel }}</span><button class="text-button" @click="pendingLevel = level; screen = 'level'">레벨 변경 ↗</button></div>
-      <span v-else class="header-caption">하루 한 문제, 나를 위한 시작</span>
+      </div>
     </header>
     <main>
       <nav class="steps" aria-label="학습 진행 단계"><span :class="{ active: screen === 'level' }">레벨 설정</span><span class="step-line"/><span :class="{ active: screen === 'question' }">오늘의 문제</span><span class="step-line"/><span :class="{ active: screen === 'result' }">정답과 해설</span></nav>
@@ -175,6 +197,7 @@ onUnmounted(() => clearInterval(timer))
           <button v-if="screen === 'question'" class="primary" :disabled="selected === null" @click="submit">정답 확인하기 <span>→</span></button>
           <div v-else class="explanation"><div class="explanation-heading"><span class="book-icon">▤</span><h2>오늘의 문법 노트</h2></div><h3>문장 해석</h3><p>{{ problem.translation }}</p><h3>정답과 문법 포인트</h3><span class="topic">{{ problem.topic }}</span><p>{{ problem.rule }}</p><h3>오답 살펴보기</h3><p v-if="problem.wrongExplanation">{{ problem.wrongExplanation }}</p><ul v-else><template v-for="(reason, index) in problem.reasons" :key="index"><li v-if="index !== problem.answer"><b>{{ 'ABCD'[index] }}</b><span>{{ reason }}</span></li></template></ul></div>
         </section>
+        <p v-if="screen === 'result' && coinEarned" class="coin-reward" role="status"><span class="coin-icon" aria-hidden="true">T</span> 오늘의 T Coin +1 획득!</p>
         <section v-if="screen === 'result'" class="feedback" aria-label="해설 피드백"><h2>해설이 이해하는 데 도움이 되었나요?</h2><div><button :disabled="!!feedback" :class="{ rated: feedback === 'helpful' }" @click="rate('helpful')">♡ 도움 됐어요</button><button :disabled="!!feedback" :class="{ rated: feedback === 'unhelpful' }" @click="rate('unhelpful')">아쉬워요</button></div><p v-if="feedback" role="status">의견 고마워요. 더 좋은 학습을 만드는 데 참고할게요.</p><p v-else>여러분의 의견으로 더 나은 해설을 만들어요.</p></section>
       </template>
       <p v-if="storageWarning" role="status" class="storage-warning">{{ storageWarning }}</p>
