@@ -26,10 +26,16 @@ function loadCoins() {
 }
 function awardCoin() {
   const dates = [...new Set([...coinDates.value, ...loadCoins()])]
-  coinEarned.value = !dates.includes(date.value)
-  if (coinEarned.value) dates.push(date.value)
+  coinEarned.value = false
+  if (!dates.includes(date.value)) {
+    const updated = [...dates, date.value]
+    if (write('toeic_coin_dates', JSON.stringify(updated))) {
+      coinEarned.value = true
+      coinDates.value = updated
+      return
+    }
+  }
   coinDates.value = dates
-  write('toeic_coin_dates', JSON.stringify(dates))
 }
 function syncCoins(event: StorageEvent) {
   if (event.key === 'toeic_coin_dates' || event.key === null) coinDates.value = loadCoins()
@@ -48,7 +54,7 @@ function read(key: string) {
   try { return localStorage.getItem(key) } catch { storageWarning.value = '브라우저 저장소를 사용할 수 없어 새로고침하면 기록이 사라질 수 있어요.'; return null }
 }
 function write(key: string, value: string) {
-  try { localStorage.setItem(key, value) } catch { storageWarning.value = '기록을 저장하지 못했어요. 현재 화면에서는 계속 학습할 수 있어요.' }
+  try { localStorage.setItem(key, value); return true } catch { storageWarning.value = '기록을 저장하지 못했어요. 코인을 포함한 학습 기록은 새로고침 후 사라질 수 있어요.'; return false }
 }
 function track(event: string, extra: Record<string, unknown> = {}) {
   const payload = { level: level.value, problem_id: problem.value.id, ...extra }
@@ -70,6 +76,10 @@ function shuffle(ids: string[]) {
 function chooseProblem(previousId = '') {
   const ids = questionBank.filter(item => item.level === level.value).map(item => item.id)
   const validIds = problems.filter(item => item.level === level.value).map(item => item.id)
+  try {
+    const saved = JSON.parse(read('toeic_problem_progress') || '{}')
+    if (saved && typeof saved === 'object' && !Array.isArray(saved)) progress.value = { ...progress.value, ...saved }
+  } catch { /* Keep the current in-memory progress. */ }
   let state = progress.value[level.value]
   const previousToday = state?.date === date.value && validIds.includes(state.problemId) ? state.problemId : ''
   if (!state || !Array.isArray(state.order) || !Number.isInteger(state.next) || state.next < 0 || state.next > state.order.length || new Set(state.order).size !== state.order.length || state.order.some(id => !ids.includes(id))) {
